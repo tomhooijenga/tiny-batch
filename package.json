@@ -1,0 +1,27 @@
+{
+  "name": "@teamawesome/tiny-batch",
+  "version": "1.0.0",
+  "description": "Batch individual calls to a single one.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "tslint --project tsconfig.json",
+    "test": "nyc mocha",
+    "prepublishOnly": "npm run lint && npm run build && npm run test"
+  },
+  "author": "Tom Hooijenga <tomhooijenga@gmail.com>",
+  "homepage": "https://github.com/tomhooijenga/tiny-batch",
+  "license": "MIT",
+  "devDependencies": {
+    "@sinonjs/fake-timers": "^7.0.1",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
+    "should": "^13.2.3",
+    "should-sinon": "0.0.6",
+    "sinon": "^9.2.3",
+    "ts-node": "^9.1.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.3"
+  }
+}
