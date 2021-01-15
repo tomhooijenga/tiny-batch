@@ -3,7 +3,7 @@ import {microtaskScheduler} from "./schedulers";
 
 export * from "./schedulers";
 
-export function tinyBatch<
+export function tinybatch<
     Result,
     Args extends unknown[] = []
 >(
@@ -17,7 +17,7 @@ export function tinyBatch<
             queue.push({args, resolve});
 
             scheduler(queue, fn.flush);
-        }))
+        }));
     };
 
     fn.queue = queue;
@@ -35,9 +35,9 @@ export function tinyBatch<
                 oldQueue[index].resolve(result);
             });
         });
-    }
+    };
 
     return fn;
 }
 
-export default tinyBatch;
+export default tinybatch;

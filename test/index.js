@@ -1,7 +1,7 @@
 require('should');
 require('should-sinon');
 const sinon = require('sinon');
-const tinyBatch = require('../src').default;
+const tinyBatch = require('../src').tinybatch;
 
 describe('tinybatch', () => {
 
