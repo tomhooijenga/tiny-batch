@@ -1,5 +1,6 @@
 module.exports = {
     "rules": {
-        "semi": ["warn", "always"]
+        "semi": ["error", "always"],
+        "quotes": ["error", "double"]
     }
 };

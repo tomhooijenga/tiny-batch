@@ -1,9 +1,9 @@
-require('should');
-require('should-sinon');
-const sinon = require('sinon');
-const tinyBatch = require('../src').tinybatch;
+require("should");
+require("should-sinon");
+const sinon = require("sinon");
+const tinyBatch = require("../src").tinybatch;
 
-describe('tinybatch', () => {
+describe("tinybatch", () => {
 
     let callback;
 
@@ -11,19 +11,19 @@ describe('tinybatch', () => {
         callback = sinon.stub().resolvesArg(0);
     });
 
-    it('should create a batcher', () => {
+    it("should create a batcher", () => {
         const batched = tinyBatch(callback);
 
         batched.should.be.Function();
 
-        batched.should.have.key('flush');
+        batched.should.have.key("flush");
         batched.flush.should.be.Function();
 
-        batched.should.have.key('queue');
+        batched.should.have.key("queue");
         batched.queue.should.be.Array();
     });
 
-    it('should batch', async () => {
+    it("should batch", async () => {
         const batched = tinyBatch(callback);
 
         const b1 = batched(1);
@@ -36,13 +36,13 @@ describe('tinybatch', () => {
         await b2.should.eventually.eql([2]);
     });
 
-    it('should not flush empty queue', async () => {
+    it("should not flush empty queue", async () => {
         const batched = tinyBatch(callback);
         batched.flush();
         callback.should.not.be.called();
     });
 
-    it('should update the queue', async () => {
+    it("should update the queue", async () => {
         const batched = tinyBatch(callback);
 
         batched.queue.should.be.size(0);
@@ -56,7 +56,7 @@ describe('tinybatch', () => {
         batched.queue.should.be.size(0);
     });
 
-    it('should flush manually', async () => {
+    it("should flush manually", async () => {
         const batched = tinyBatch(callback);
         const b1 = batched(1);
         batched.flush();
@@ -65,7 +65,7 @@ describe('tinybatch', () => {
         await b1.should.eventually.eql([1]);
     });
 
-    it('should call scheduler', async () => {
+    it("should call scheduler", async () => {
         const scheduler = sinon.spy((queue, flush) => {
             queue.should.be.an.Array()
                 .and.equal(batched.queue);

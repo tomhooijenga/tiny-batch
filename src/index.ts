@@ -2,6 +2,7 @@ import {AddToBatch, BatchEntry, ExecuteBatch, Scheduler} from "./types";
 import {microtaskScheduler} from "./schedulers";
 
 export * from "./schedulers";
+export * from "./types";
 
 export function tinybatch<
     Result,
@@ -27,10 +28,10 @@ export function tinybatch<
         }
 
         const oldQueue = [...queue];
-        const batchedArgs = queue.map(({args}) => args);
+        const args = queue.map(({args}) => args);
         queue.length = 0;
 
-        callback(batchedArgs).then((results) => {
+        callback(args).then((results) => {
             results.forEach((result, index) => {
                 oldQueue[index].resolve(result);
             });

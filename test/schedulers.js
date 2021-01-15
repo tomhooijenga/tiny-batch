@@ -1,10 +1,10 @@
-require('should');
-require('should-sinon');
-const sinon = require('sinon');
+require("should");
+require("should-sinon");
+const sinon = require("sinon");
 const timers = require("@sinonjs/fake-timers");
-const {microtaskScheduler, intervalScheduler, timeoutScheduler, amountScheduler} = require('../src');
+const {microtaskScheduler, intervalScheduler, timeoutScheduler, amountScheduler} = require("../src");
 
-describe('schedulers', () => {
+describe("schedulers", () => {
     const QUEUE = [{}];
 
     let flush;
@@ -12,10 +12,10 @@ describe('schedulers', () => {
         flush = sinon.stub();
     });
 
-    describe('microtaskScheduler', function () {
+    describe("microtaskScheduler", function () {
         const scheduler = microtaskScheduler();
 
-        it('should flush', async () => {
+        it("should flush", async () => {
             const flush = sinon.stub();
 
             scheduler(QUEUE, flush);
@@ -25,10 +25,10 @@ describe('schedulers', () => {
         });
     });
 
-    describe('amountScheduler', () => {
+    describe("amountScheduler", () => {
         const scheduler = amountScheduler(2);
 
-        it('should flush', () => {
+        it("should flush", () => {
             scheduler(QUEUE, flush);
             flush.should.not.be.called();
             scheduler([{}, {}], flush);
@@ -36,7 +36,7 @@ describe('schedulers', () => {
         });
     });
 
-    describe('timers', () => {
+    describe("timers", () => {
         const MS = 100;
         let flush;
         let clock;
@@ -50,10 +50,10 @@ describe('schedulers', () => {
             clock.uninstall();
         });
 
-        describe('intervalScheduler', () => {
+        describe("intervalScheduler", () => {
             const scheduler = intervalScheduler(MS);
 
-            it('should flush', () => {
+            it("should flush", () => {
                 scheduler(QUEUE, flush);
                 flush.should.not.be.called();
                 clock.next();
@@ -62,8 +62,8 @@ describe('schedulers', () => {
                 flush.should.be.calledTwice();
             });
 
-            it('should not create multiple intervals', () => {
-                sinon.spy(global, 'setInterval');
+            it("should not create multiple intervals", () => {
+                sinon.spy(global, "setInterval");
 
                 scheduler(QUEUE, flush);
                 setInterval.should.be.calledOnce();
@@ -73,7 +73,7 @@ describe('schedulers', () => {
                 setInterval.restore();
             });
 
-            it('stop and resume', async () => {
+            it("stop and resume", async () => {
                 scheduler(QUEUE, flush);
                 scheduler.stop();
                 clock.next();
@@ -85,18 +85,18 @@ describe('schedulers', () => {
             });
         });
 
-        describe('timeoutScheduler', () => {
+        describe("timeoutScheduler", () => {
             const scheduler = timeoutScheduler(MS);
 
-            it('should flush', () => {
+            it("should flush", () => {
                 scheduler(QUEUE, flush);
                 flush.should.not.be.called();
                 clock.next();
                 flush.should.be.calledOnce();
             });
 
-            it('should not create multiple timeouts', () => {
-                sinon.spy(global, 'setTimeout');
+            it("should not create multiple timeouts", () => {
+                sinon.spy(global, "setTimeout");
 
                 scheduler(QUEUE, flush);
                 setTimeout.should.be.calledOnce();
@@ -106,7 +106,7 @@ describe('schedulers', () => {
                 setTimeout.restore();
             });
 
-            it('stop and resume', async () => {
+            it("stop and resume", async () => {
                 scheduler(QUEUE, flush);
                 scheduler.stop();
                 clock.next();
