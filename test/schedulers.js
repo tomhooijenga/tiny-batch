@@ -1,8 +1,8 @@
-const should = require('should');
+require('should');
+require('should-sinon');
 const sinon = require('sinon');
 const timers = require("@sinonjs/fake-timers");
 const {microtaskScheduler, intervalScheduler, timeoutScheduler, amountScheduler} = require('../src');
-require('should-sinon');
 
 describe('schedulers', () => {
     const QUEUE = [{}];

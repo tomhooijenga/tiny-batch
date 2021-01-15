@@ -9,7 +9,7 @@ describe('tinybatch', () => {
 
     beforeEach(() => {
         callback = sinon.stub().resolvesArg(0);
-    })
+    });
 
     it('should create a batcher', () => {
         const batched = tinyBatch(callback);
@@ -89,4 +89,4 @@ describe('tinybatch', () => {
             b2.should.eventually.eql([2]),
         ]);
     });
-})
+});
