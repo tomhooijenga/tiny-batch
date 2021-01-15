@@ -8,8 +8,8 @@ export const microtaskScheduler = (): Scheduler => {
         if (queue.length === 1) {
             queueMicrotask(flush);
         }
-    }
-}
+    };
+};
 
 /**
  * Flushes every given ms, regardless of the queue.
@@ -20,14 +20,14 @@ export const intervalScheduler = (ms: number): Scheduler & { stop(): void } => {
         if (queue.length === 1) {
             timerId = setInterval(flush, ms);
         }
-    }
+    };
     fn.stop = () => {
         clearInterval(timerId);
         timerId = undefined;
-    }
+    };
 
     return fn;
-}
+};
 /**
  * Waits the given amount of ms after the first call to flush.
  */
@@ -37,14 +37,14 @@ export const timeoutScheduler = (ms: number): Scheduler & { stop(): void } => {
         if (queue.length === 1) {
             timerId = setTimeout(flush, ms);
         }
-    }
+    };
     fn.stop = () => {
         clearTimeout(timerId);
         timerId = undefined;
-    }
+    };
 
     return fn;
-}
+};
 
 /**
  * Flushes after the given amount of calls.
@@ -55,5 +55,5 @@ export const amountScheduler = (max: number): Scheduler => {
         if (queue.length === max) {
             flush();
         }
-    }
-}
+    };
+};
