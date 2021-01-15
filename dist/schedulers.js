@@ -1,22 +1,23 @@
-import {Scheduler} from "./types";
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.amountScheduler = exports.timeoutScheduler = exports.intervalScheduler = exports.microtaskScheduler = void 0;
 /**
  * Queues a flush in the microtask queue at the first call.
  */
-export const microtaskScheduler = (): Scheduler => {
+const microtaskScheduler = () => {
     return (queue, flush) => {
         if (queue.length === 1) {
             queueMicrotask(flush);
         }
     };
 };
-
+exports.microtaskScheduler = microtaskScheduler;
 /**
  * Flushes every given ms, regardless of the queue.
  */
-export const intervalScheduler = (ms: number): Scheduler & { stop(): void } => {
-    let timerId: number | undefined;
-    const fn: Scheduler & { stop(): void } = (queue, flush) => {
+const intervalScheduler = (ms) => {
+    let timerId;
+    const fn = (queue, flush) => {
         if (queue.length === 1) {
             timerId = setInterval(flush, ms);
         }
@@ -25,16 +26,15 @@ export const intervalScheduler = (ms: number): Scheduler & { stop(): void } => {
         clearInterval(timerId);
         timerId = undefined;
     };
-
     return fn;
 };
-
+exports.intervalScheduler = intervalScheduler;
 /**
  * Waits the given amount of ms after the first call to flush.
  */
-export const timeoutScheduler = (ms: number): Scheduler & { stop(): void } => {
-    let timerId: number | undefined;
-    const fn: Scheduler & { stop(): void } = (queue, flush) => {
+const timeoutScheduler = (ms) => {
+    let timerId;
+    const fn = (queue, flush) => {
         if (queue.length === 1) {
             timerId = setTimeout(flush, ms);
         }
@@ -43,18 +43,18 @@ export const timeoutScheduler = (ms: number): Scheduler & { stop(): void } => {
         clearTimeout(timerId);
         timerId = undefined;
     };
-
     return fn;
 };
-
+exports.timeoutScheduler = timeoutScheduler;
 /**
  * Flushes after the given amount of calls.
  * @param max
  */
-export const amountScheduler = (max: number): Scheduler => {
+const amountScheduler = (max) => {
     return (queue, flush) => {
         if (queue.length === max) {
             flush();
         }
     };
 };
+exports.amountScheduler = amountScheduler;
