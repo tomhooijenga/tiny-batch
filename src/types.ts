@@ -1,6 +1,6 @@
 import {Queue} from "./queue";
 
-export type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Result[]>;
+export type ExecuteBatch<Result, Args> = (args: Args[]) => Result[] | Promise<Result[]>;
 
 export type Scheduler = (queue: any[][], flush: () => void) => void;
 

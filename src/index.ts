@@ -32,11 +32,13 @@ export function tinybatch<
 
         const {args, resolvers} = queue.reset();
 
-        callback(args).then((results) => {
-            results.forEach((args, index) => {
-                resolvers[index](args);
+        Promise
+            .resolve(callback(args))
+            .then((results) => {
+                results.forEach((args, index) => {
+                    resolvers[index](args);
+                });
             });
-        });
     };
 
     return fn;

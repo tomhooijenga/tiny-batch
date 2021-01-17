@@ -37,6 +37,20 @@ describe("tinybatch", () => {
         await b2.should.eventually.eql([2]);
     });
 
+    it("should batch sync", async () => {
+        callback = sinon.stub().returnsArg(0);
+        const batched = tinyBatch(callback);
+
+        const b1 = batched(1);
+        const b2 = batched(2);
+
+        await Promise.resolve();
+        callback.should.be.calledWith([[1], [2]]);
+
+        await b1.should.eventually.eql([1]);
+        await b2.should.eventually.eql([2]);
+    });
+
     it("should not flush empty queue", async () => {
         const batched = tinyBatch(callback);
         batched.flush();
