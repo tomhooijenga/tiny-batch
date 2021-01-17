@@ -24,6 +24,7 @@ export function tinybatch<
     };
 
     fn.queue = queue;
+    fn.scheduler = scheduler;
     fn.flush = () => {
         if (queue.isEmpty()) {
             return;

@@ -11,6 +11,8 @@ export interface AddToBatch<Result, Args extends unknown[]> {
 
     queue: Queue<Result, Args>;
 
+    scheduler: Scheduler;
+
     flush(): void
 }
 

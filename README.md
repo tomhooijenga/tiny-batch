@@ -61,6 +61,7 @@ scheduler is called each time an entry is added to the batch. `tinybatch` comes 
 |`timeoutScheduler(ms)`|Waits the given amount of ms after the first call to flush. The timer can be cleared with the `stop()` method.|
 |`amountScheduler(amount)`|Flushes after the given amount of calls.|
 
+
 ```ts
 import {tinybatch, amountScheduler} from '@teamawesome/tiny-batch';
 
@@ -90,7 +91,7 @@ console.log(batchedFunc.scheduler);
 
 # Types
 ```ts
-function tinybatch<
+export declare function tinybatch<
     Result,
     Args extends unknown[] = []
     >(
@@ -98,21 +99,27 @@ function tinybatch<
     scheduler: Scheduler = microtaskScheduler()
 ): AddToBatch<Result, Args>;
 
-type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Result[]>;
+export declare type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Result[]>;
 
-type Scheduler = (queue: BatchEntry<any, any[]>[], flush: () => void) => void;
+export declare type Scheduler = (queue: any[][], flush: () => void) => void;
 
-interface BatchEntry<Result, Args> {
-    args: Args,
+export declare type Resolver<Result> = (value: Result | PromiseLike<Result>) => void;
 
-    resolve: (value: Result) => void
+export interface AddToBatch<Result, Args extends unknown[]> {
+    (...args: Args): Promise<Result>;
+    queue: Queue<Result, Args>;
+    flush(): void;
 }
 
-interface AddToBatch<Result, Args extends unknown[]> {
-    (...args: Args): Promise<Result>;
-
-    queue: BatchEntry<Result, Args>[];
-
-    flush(): void
+export declare class Queue<Result, Args> {
+    readonly args: Args[];
+    readonly resolvers: Resolver<Result>[];
+    add(args: Args, resolver: Resolver<Result>): void;
+    reset(): {
+        args: Args[];
+        resolvers: Resolver<Result>[];
+    };
+    isEmpty(): boolean;
+    get length(): number;
 }
 ```

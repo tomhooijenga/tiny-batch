@@ -1,8 +1,8 @@
 import {Resolver} from "./types";
 
 export class Queue<Result, Args> {
-    args: Args[] = [];
-    resolvers: Resolver<Result>[] = [];
+    readonly args: Args[] = [];
+    readonly resolvers: Resolver<Result>[] = [];
 
     add(args: Args, resolver: Resolver<Result>): void {
         this.args.push(args);
