@@ -1,17 +1,15 @@
+import {Queue} from "./queue";
+
 export type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Result[]>;
 
-export type Scheduler = (queue: BatchEntry<any, any[]>[], flush: () => void) => void;
+export type Scheduler = (queue: any[][], flush: () => void) => void;
 
-export interface BatchEntry<Result, Args> {
-    args: Args,
-
-    resolve: (value: Result) => void
-}
+export type Resolver<Result> = (value: Result | PromiseLike<Result>) => void;
 
 export interface AddToBatch<Result, Args extends unknown[]> {
     (...args: Args): Promise<Result>;
 
-    queue: BatchEntry<Result, Args>[];
+    queue: Queue<Result, Args>;
 
     flush(): void
 }

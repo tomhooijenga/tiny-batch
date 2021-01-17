@@ -2,6 +2,7 @@ require("should");
 require("should-sinon");
 const sinon = require("sinon");
 const tinyBatch = require("../src").tinybatch;
+const Queue = require("../src/queue.ts").Queue;
 
 describe("tinybatch", () => {
 
@@ -20,7 +21,7 @@ describe("tinybatch", () => {
         batched.flush.should.be.Function();
 
         batched.should.have.key("queue");
-        batched.queue.should.be.Array();
+        batched.queue.should.be.instanceOf(Queue);
     });
 
     it("should batch", async () => {
@@ -45,15 +46,15 @@ describe("tinybatch", () => {
     it("should update the queue", async () => {
         const batched = tinyBatch(callback);
 
-        batched.queue.should.be.size(0);
+        batched.queue.length.should.eql(0);
 
         batched(1);
         batched(2);
 
-        batched.queue.should.be.size(2);
+        batched.queue.length.should.eql(2);
 
         await Promise.resolve();
-        batched.queue.should.be.size(0);
+        batched.queue.length.should.eql(0);
     });
 
     it("should flush manually", async () => {
@@ -67,22 +68,18 @@ describe("tinybatch", () => {
 
     it("should call scheduler", async () => {
         const scheduler = sinon.spy((queue, flush) => {
-            queue.should.be.an.Array()
-                .and.equal(batched.queue);
-            flush.should.be.a.Function()
-                .equal(batched.flush);
-
-            flush(queue);
+            flush();
         });
         const batched = tinyBatch(callback, scheduler);
 
         const b1 = batched(1);
-        batched.queue.should.be.size(0);
+        batched.queue.length.should.eql(0);
         const b2 = batched(2);
-        batched.queue.should.be.size(0);
+        batched.queue.length.should.eql(0);
 
         callback.should.be.calledTwice();
-        scheduler.should.be.calledTwice();
+        scheduler.should.be.calledTwice()
+            .and.alwaysCalledWithExactly(batched.queue.args, batched.flush);
 
         await Promise.all([
             b1.should.eventually.eql([1]),

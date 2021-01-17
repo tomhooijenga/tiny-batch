@@ -1,5 +1,6 @@
-import {AddToBatch, BatchEntry, ExecuteBatch, Scheduler} from "./types";
+import {AddToBatch, ExecuteBatch, Scheduler} from "./types";
 import {microtaskScheduler} from "./schedulers";
+import {Queue} from "./queue";
 
 export * from "./schedulers";
 export * from "./types";
@@ -11,29 +12,28 @@ export function tinybatch<
     callback: ExecuteBatch<Result, Args>,
     scheduler: Scheduler = microtaskScheduler()
 ): AddToBatch<Result, Args> {
-    const queue: BatchEntry<Result, Args>[] = [];
+
+    const queue = new Queue<Result, Args>();
 
     const fn: AddToBatch<Result, Args> = (...args: Args) => {
         return new Promise<Result>((resolve => {
-            queue.push({args, resolve});
+            queue.add(args, resolve);
 
-            scheduler(queue, fn.flush);
+            scheduler(queue.args, fn.flush);
         }));
     };
 
     fn.queue = queue;
     fn.flush = () => {
-        if (queue.length === 0) {
+        if (queue.isEmpty()) {
             return;
         }
 
-        const oldQueue = [...queue];
-        const args = queue.map(({args}) => args);
-        queue.length = 0;
+        const {args, resolvers} = queue.reset();
 
         callback(args).then((results) => {
-            results.forEach((result, index) => {
-                oldQueue[index].resolve(result);
+            results.forEach((args, index) => {
+                resolvers[index](args);
             });
         });
     };
