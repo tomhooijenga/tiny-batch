@@ -8,9 +8,14 @@
     "combine",
     "callback"
   ],
-  "main": "dist/index.js",
+  "source": "src/index.ts",
+  "main": "dist/tiny-batch.js",
+  "exports": "dist/tiny-batch.modern.js",
+  "module": "dist/tiny-batch.module.js",
+  "unpkg": "dist/tiny-batch.umd.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "microbundle --no-compress",
     "dev": "tsc --watch",
     "lint": "eslint ./src --config ./eslint/src.js",
     "lint:test": "eslint ./test --config ./eslint/test.js",
@@ -25,12 +30,12 @@
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "eslint": "^7.17.0",
+    "microbundle": "^0.13.0",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "should": "^13.2.3",
     "should-sinon": "0.0.6",
     "sinon": "^9.2.3",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.3"
+    "ts-node": "^9.1.1"
   }
 }
