@@ -65,9 +65,12 @@ class Queue {
     this.resolvers = [];
   }
 
-  add(args, resolver) {
+  add(args, resolve, reject) {
     this.args.push(args);
-    this.resolvers.push(resolver);
+    this.resolvers.push({
+      resolve,
+      reject
+    });
   }
 
   reset() {
@@ -93,8 +96,8 @@ function tinybatch(callback, scheduler = microtaskScheduler()) {
   const queue = new Queue();
 
   const fn = (...args) => {
-    return new Promise(resolve => {
-      queue.add(args, resolve);
+    return new Promise((resolve, reject) => {
+      queue.add(args, resolve, reject);
       scheduler(queue.args, fn.flush);
     });
   };
@@ -112,8 +115,17 @@ function tinybatch(callback, scheduler = microtaskScheduler()) {
       resolvers
     } = queue.reset();
     Promise.resolve(callback(args)).then(results => {
-      results.forEach((args, index) => {
-        resolvers[index](args);
+      results.forEach((result, index) => {
+        const {
+          resolve,
+          reject
+        } = resolvers[index];
+
+        if (result instanceof Error) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
       });
     });
   };

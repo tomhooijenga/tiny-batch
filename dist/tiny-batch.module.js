@@ -83,9 +83,12 @@ var Queue = /*#__PURE__*/function () {
 
   var _proto = Queue.prototype;
 
-  _proto.add = function add(args, resolver) {
+  _proto.add = function add(args, resolve, reject) {
     this.args.push(args);
-    this.resolvers.push(resolver);
+    this.resolvers.push({
+      resolve: resolve,
+      reject: reject
+    });
   };
 
   _proto.reset = function reset() {
@@ -120,8 +123,8 @@ function tinybatch(callback, scheduler) {
 
   var fn = function fn() {
     var _arguments = arguments;
-    return new Promise(function (resolve) {
-      queue.add([].slice.call(_arguments), resolve);
+    return new Promise(function (resolve, reject) {
+      queue.add([].slice.call(_arguments), resolve, reject);
       scheduler(queue.args, fn.flush);
     });
   };
@@ -139,8 +142,16 @@ function tinybatch(callback, scheduler) {
         resolvers = _queue$reset.resolvers;
 
     Promise.resolve(callback(args)).then(function (results) {
-      results.forEach(function (args, index) {
-        resolvers[index](args);
+      results.forEach(function (result, index) {
+        var _resolvers$index = resolvers[index],
+            resolve = _resolvers$index.resolve,
+            reject = _resolvers$index.reject;
+
+        if (result instanceof Error) {
+          reject(result);
+        } else {
+          resolve(result);
+        }
       });
     });
   };
