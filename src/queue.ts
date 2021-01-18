@@ -1,15 +1,15 @@
-import {Resolver} from "./types";
+import {Reject, Resolve} from "./types";
 
 export class Queue<Result, Args> {
     readonly args: Args[] = [];
-    readonly resolvers: Resolver<Result>[] = [];
+    readonly resolvers: {resolve: Resolve<Result>; reject: Reject}[] = [];
 
-    add(args: Args, resolver: Resolver<Result>): void {
+    add(args: Args, resolve: Resolve<Result>, reject: Reject): void {
         this.args.push(args);
-        this.resolvers.push(resolver);
+        this.resolvers.push({resolve, reject});
     }
 
-    reset(): {args: Args[]; resolvers: Resolver<Result>[]} {
+    reset(): {args: Args[]; resolvers: {resolve: Resolve<Result>; reject: Reject}[]} {
         const args = this.args.splice(0);
         const resolvers = this.resolvers.splice(0);
 

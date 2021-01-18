@@ -51,6 +51,18 @@ describe("tinybatch", () => {
         await b2.should.eventually.eql([2]);
     });
 
+    it("should reject", async () => {
+        const batched = tinyBatch(() => {
+            return [[1], new Error("reject")];
+        });
+
+        const b1 = batched(1);
+        const b2 = batched(2);
+
+        await b1.should.resolvedWith([1]);
+        await b2.should.rejectedWith("reject");
+    });
+
     it("should not flush empty queue", async () => {
         const batched = tinyBatch(callback);
         batched.flush();

@@ -16,8 +16,8 @@ export function tinybatch<
     const queue = new Queue<Result, Args>();
 
     const fn: AddToBatch<Result, Args> = (...args: Args) => {
-        return new Promise<Result>((resolve => {
-            queue.add(args, resolve);
+        return new Promise<Result>(((resolve, reject) => {
+            queue.add(args, resolve, reject);
 
             scheduler(queue.args, fn.flush);
         }));
@@ -35,8 +35,14 @@ export function tinybatch<
         Promise
             .resolve(callback(args))
             .then((results) => {
-                results.forEach((args, index) => {
-                    resolvers[index](args);
+                results.forEach((result, index) => {
+                    const {resolve, reject} = resolvers[index];
+
+                    if (result instanceof Error) {
+                        reject(result);
+                    } else {
+                        resolve(result);
+                    }
                 });
             });
     };

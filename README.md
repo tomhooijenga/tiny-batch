@@ -30,8 +30,8 @@ const user2 = await getUserById(2);
 
 ## Callback
 Each call of the batched function adds its arguments to the queue as-is. The callback then gets an array of all these
-arguments. The callback must return an `array` or a `promise of an array`. The return value will be used to resolve the
-batched function calls in the same order.
+arguments. The callback must return an `array` or a `promise of an array`. The return value will be used to _resolve_
+the batched function calls in the same order. If an entry is `instanceof Error`, the call will be _rejected_.
 
 ```ts
 import tinybatch from '@teamawesome/tiny-batch';
@@ -103,7 +103,9 @@ export declare type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Resul
 
 export declare type Scheduler = (queue: any[][], flush: () => void) => void;
 
-export declare type Resolver<Result> = (value: Result | PromiseLike<Result>) => void;
+export declare type Resolve<Result> = (value: Result | PromiseLike<Result>) => void;
+
+export declare type Reject = (reason?: any) => void;
 
 export interface AddToBatch<Result, Args extends unknown[]> {
     (...args: Args): Promise<Result>;
@@ -113,13 +115,20 @@ export interface AddToBatch<Result, Args extends unknown[]> {
 
 export declare class Queue<Result, Args> {
     readonly args: Args[];
-    readonly resolvers: Resolver<Result>[];
-    add(args: Args, resolver: Resolver<Result>): void;
+    readonly resolvers: {
+        resolve: Resolve<Result>;
+        reject: Reject;
+    }[];
+    add(args: Args, resolve: Resolve<Result>, reject: Reject): void;
     reset(): {
         args: Args[];
-        resolvers: Resolver<Result>[];
+        resolvers: {
+            resolve: Resolve<Result>;
+            reject: Reject;
+        }[];
     };
     isEmpty(): boolean;
     get length(): number;
 }
+
 ```
