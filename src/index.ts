@@ -16,11 +16,11 @@ export function tinybatch<
     const queue = new Queue<Result, Args>();
 
     const fn: AddToBatch<Result, Args> = (...args: Args) => {
-        return new Promise<Result>(((resolve, reject) => {
+        return new Promise<Result>((resolve, reject) => {
             queue.add(args, resolve, reject);
 
             scheduler(queue.args, fn.flush);
-        }));
+        });
     };
 
     fn.queue = queue;

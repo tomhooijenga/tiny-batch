@@ -2,6 +2,10 @@
 ```shell script
 npm install @teamawesome/tiny-batch
 ```
+# tiny-batch
+tiny-batch is a utility to create functions of which the execution is batched. This can be very useful for instance to
+limit the amount of queries or http requests while still having a single, easy to use function.
+
 # Usage
 Call `tinybatch` to create an async function that adds to the batch. The first argument is a callback that will handle the batching.
 ```ts
@@ -17,8 +21,8 @@ import tinybatch from '@teamawesome/tiny-batch';
 
 const getUserById = tinybatch((batchedArgs) => {
   // batchedArgs equals [[1], [2]]
-    
   const userIds = batchedArgs.flat();
+
   return fetch(`api/${userIds}`)
           .then(response => response.json())
           .then(json => json.users);
@@ -89,6 +93,25 @@ The scheduler of a tinybatch is available. Some schedulers have extra methods, f
 console.log(batchedFunc.scheduler);
 ```
 
+# Caching
+To reduce overhead even more, caching can be introduced. While this is not supported directly by tiny-batch, it is very
+simple to achieve. Use any of the memoization libraries available. For example, [memoizee](https://www.npmjs.com/package/memoizee);
+```ts
+import memoizee from 'memoizee';
+
+const batched = tinybatch((args) => {
+    // code
+});
+const batchedAndCached = memoizee(batched, {
+    // Set the amount of arguments that "batchedAndCached" will receive.
+    length: 1
+});
+
+await batchedAndCached('once');
+await batchedAndCached('once');
+```
+The second call is not added to the queue but will resolve with the same value.
+
 # Types
 ```ts
 export declare function tinybatch<
@@ -130,5 +153,4 @@ export declare class Queue<Result, Args> {
     isEmpty(): boolean;
     get length(): number;
 }
-
 ```
