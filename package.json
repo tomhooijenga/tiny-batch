@@ -1,6 +1,6 @@
 {
   "name": "@teamawesome/tiny-batch",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Combine individual calls to a single one.",
   "keywords": [
     "batch",
