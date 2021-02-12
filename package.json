@@ -6,14 +6,15 @@
     "batch",
     "queue",
     "combine",
-    "callback"
+    "callback",
+    "dataloader"
   ],
-  "source": "src/index.ts",
-  "main": "dist/tiny-batch.js",
-  "exports": "dist/tiny-batch.modern.js",
-  "module": "dist/tiny-batch.module.js",
-  "unpkg": "dist/tiny-batch.umd.js",
-  "types": "dist/index.d.ts",
+  "source": "./src/index.ts",
+  "main": "./dist/tiny-batch.js",
+  "exports": "./dist/tiny-batch.modern.js",
+  "module": "./dist/tiny-batch.module.js",
+  "unpkg": "./dist/tiny-batch.umd.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "microbundle --no-compress",
     "dev": "tsc --watch",
