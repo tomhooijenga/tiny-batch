@@ -159,6 +159,5 @@ function tinybatch(callback, scheduler) {
   return fn;
 }
 
-export default tinybatch;
-export { amountScheduler, intervalScheduler, microtaskScheduler, timeoutScheduler, tinybatch };
+export { amountScheduler, tinybatch as default, intervalScheduler, microtaskScheduler, timeoutScheduler, tinybatch };
 //# sourceMappingURL=tiny-batch.module.js.map
