@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.tinyBatch = {}));
-}(this, (function (exports) {
+})(this, (function (exports) {
     /**
      * Queues a flush in the microtask queue at the first call.
      */
@@ -165,11 +165,11 @@
     }
 
     exports.amountScheduler = amountScheduler;
-    exports.default = tinybatch;
+    exports["default"] = tinybatch;
     exports.intervalScheduler = intervalScheduler;
     exports.microtaskScheduler = microtaskScheduler;
     exports.timeoutScheduler = timeoutScheduler;
     exports.tinybatch = tinybatch;
 
-})));
+}));
 //# sourceMappingURL=tiny-batch.umd.js.map

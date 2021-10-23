@@ -160,7 +160,7 @@ function tinybatch(callback, scheduler) {
 }
 
 exports.amountScheduler = amountScheduler;
-exports.default = tinybatch;
+exports["default"] = tinybatch;
 exports.intervalScheduler = intervalScheduler;
 exports.microtaskScheduler = microtaskScheduler;
 exports.timeoutScheduler = timeoutScheduler;
