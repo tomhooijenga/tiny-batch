@@ -47,7 +47,7 @@ describe("schedulers", () => {
         });
 
         afterEach(() => {
-            clock.restore();
+            clock.uninstall();
         });
 
         describe("intervalScheduler", () => {
