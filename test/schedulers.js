@@ -46,8 +46,8 @@ describe("schedulers", () => {
             flush = sinon.stub();
         });
 
-        after(() => {
-            clock.uninstall();
+        afterEach(() => {
+            clock.restore();
         });
 
         describe("intervalScheduler", () => {
