@@ -46,7 +46,7 @@ describe("schedulers", () => {
             flush = sinon.stub();
         });
 
-        after(() => {
+        afterEach(() => {
             clock.uninstall();
         });
 
