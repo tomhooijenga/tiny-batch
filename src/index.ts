@@ -7,7 +7,7 @@ export * from "./types";
 
 export function tinybatch<
     Args extends unknown[],
-    Result extends unknown,
+    Result,
 >(
     callback: ExecuteBatch<Args, Result>,
     scheduler: Scheduler = microtaskScheduler()
