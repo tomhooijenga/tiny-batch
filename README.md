@@ -19,7 +19,7 @@ For example, fetch users from different components with a single request:
 ```ts
 import tinybatch from '@teamawesome/tiny-batch';
 
-const getUserById = tinybatch((batchedArgs) => {
+const getUserById = tinybatch((batchedArgs: [number][]): User[] => {
   // batchedArgs equals [[1], [2]]
   const userIds = batchedArgs.flat();
 
@@ -40,7 +40,7 @@ the batched function calls in the same order. If an entry is `instanceof Error`,
 ```ts
 import tinybatch from '@teamawesome/tiny-batch';
 
-const batchedFunc = tinybatch((batchedArgs) => {
+const batchedFunc = tinybatch((batchedArgs: unknown[][]): string[] => {
     // batchedArgs equals
     // [
     //  [1, 2, 3],
@@ -111,46 +111,3 @@ await batchedAndCached('once');
 await batchedAndCached('once');
 ```
 The second call is not added to the queue but will resolve with the same value.
-
-# Types
-```ts
-export declare function tinybatch<
-    Result,
-    Args extends unknown[] = []
-    >(
-    callback: ExecuteBatch<Result, Args>,
-    scheduler: Scheduler = microtaskScheduler()
-): AddToBatch<Result, Args>;
-
-export declare type ExecuteBatch<Result, Args> = (args: Args[]) => Promise<Result[]>;
-
-export declare type Scheduler = (queue: any[][], flush: () => void) => void;
-
-export declare type Resolve<Result> = (value: Result | PromiseLike<Result>) => void;
-
-export declare type Reject = (reason?: any) => void;
-
-export interface AddToBatch<Result, Args extends unknown[]> {
-    (...args: Args): Promise<Result>;
-    queue: Queue<Result, Args>;
-    flush(): void;
-}
-
-export declare class Queue<Result, Args> {
-    readonly args: Args[];
-    readonly resolvers: {
-        resolve: Resolve<Result>;
-        reject: Reject;
-    }[];
-    add(args: Args, resolve: Resolve<Result>, reject: Reject): void;
-    reset(): {
-        args: Args[];
-        resolvers: {
-            resolve: Resolve<Result>;
-            reject: Reject;
-        }[];
-    };
-    isEmpty(): boolean;
-    get length(): number;
-}
-```

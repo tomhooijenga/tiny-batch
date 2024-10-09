@@ -63,6 +63,30 @@ describe("tinybatch", () => {
         await b2.should.rejectedWith("reject");
     });
 
+    it('should always resolve, even with incomplete result', async () => {
+        const batched = tinyBatch(() => {
+            return [1];
+        });
+
+        const b1 = batched(1);
+        const b2 = batched(2);
+
+        await b1.should.resolvedWith(1);
+        await b2.should.resolvedWith(undefined);
+    });
+
+    it('should always resolve, even with no result', async () => {
+        const batched = tinyBatch(() => {
+            return undefined;
+        });
+
+        const b1 = batched(1);
+        const b2 = batched(2);
+
+        await b1.should.resolvedWith(undefined);
+        await b2.should.resolvedWith(undefined);
+    });
+
     it("should not flush empty queue", async () => {
         const batched = tinyBatch(callback);
         batched.flush();

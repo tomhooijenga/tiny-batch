@@ -6,17 +6,17 @@ export * from "./schedulers";
 export * from "./types";
 
 export function tinybatch<
-    Result,
-    Args extends unknown[] = []
+    Args extends unknown[],
+    Result extends unknown,
 >(
-    callback: ExecuteBatch<Result, Args>,
+    callback: ExecuteBatch<Args, Result>,
     scheduler: Scheduler = microtaskScheduler()
-): AddToBatch<Result, Args> {
+): AddToBatch<Args, Result> {
 
-    const queue = new Queue<Result, Args>();
+    const queue = new Queue<Args, Result>();
 
-    const fn: AddToBatch<Result, Args> = (...args: Args) => {
-        return new Promise<Result>((resolve, reject) => {
+    const fn: AddToBatch<Args, Result> = (...args) => {
+        return new Promise((resolve, reject) => {
             queue.add(args, resolve, reject);
 
             scheduler(queue.args, fn.flush);
@@ -25,26 +25,24 @@ export function tinybatch<
 
     fn.queue = queue;
     fn.scheduler = scheduler;
-    fn.flush = () => {
+    fn.flush = async () => {
         if (queue.isEmpty()) {
             return;
         }
 
         const {args, resolvers} = queue.reset();
+        const results = await callback(args) ?? [];
 
-        Promise
-            .resolve(callback(args))
-            .then((results) => {
-                results.forEach((result, index) => {
-                    const {resolve, reject} = resolvers[index];
+        for (let i = 0; i < resolvers.length; i++) {
+            const { resolve, reject } = resolvers[i];
+            const result = results[i];
 
-                    if (result instanceof Error) {
-                        reject(result);
-                    } else {
-                        resolve(result);
-                    }
-                });
-            });
+            if (result instanceof Error) {
+                reject(result);
+            } else {
+                resolve(result);
+            }
+        }
     };
 
     return fn;

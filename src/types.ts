@@ -1,6 +1,16 @@
 import {Queue} from "./queue";
 
-export type ExecuteBatch<Result, Args> = (args: Args[]) => Result[] | Promise<Result[]>;
+export type ExecuteBatch<Args extends unknown[], Result> = (args: Args[]) => Result[] | Promise<Result[]> | void;
+
+export interface AddToBatch<Args extends unknown[], Result> {
+    (...args: Args): Promise<Result>;
+
+    queue: Queue<Args, Result>;
+
+    scheduler: Scheduler;
+
+    flush(): void
+}
 
 export type Scheduler = (queue: unknown[][], flush: () => void) => void;
 
@@ -8,13 +18,7 @@ export type Resolve<Result> = (value: Result | PromiseLike<Result>) => void;
 
 export type Reject = (reason?: unknown) => void;
 
-export interface AddToBatch<Result, Args extends unknown[]> {
-    (...args: Args): Promise<Result>;
-
-    queue: Queue<Result, Args>;
-
-    scheduler: Scheduler;
-
-    flush(): void
+export type Resolver<Result> = {
+    resolve: Resolve<Result>;
+    reject: Reject;
 }
-
