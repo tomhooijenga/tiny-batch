@@ -88,7 +88,8 @@ function tinybatch(callback, scheduler = microtaskScheduler()) {
   };
   fn.queue = queue;
   fn.scheduler = scheduler;
-  fn.flush = () => {
+  fn.flush = async () => {
+    var _await$callback;
     if (queue.isEmpty()) {
       return;
     }
@@ -96,19 +97,19 @@ function tinybatch(callback, scheduler = microtaskScheduler()) {
       args,
       resolvers
     } = queue.reset();
-    Promise.resolve(callback(args)).then(results => {
-      results.forEach((result, index) => {
-        const {
-          resolve,
-          reject
-        } = resolvers[index];
-        if (result instanceof Error) {
-          reject(result);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    const results = (_await$callback = await callback(args)) != null ? _await$callback : [];
+    for (let i = 0; i < resolvers.length; i++) {
+      const {
+        resolve,
+        reject
+      } = resolvers[i];
+      const result = results[i];
+      if (result instanceof Error) {
+        reject(result);
+      } else {
+        resolve(result);
+      }
+    }
   };
   return fn;
 }

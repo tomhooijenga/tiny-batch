@@ -123,24 +123,29 @@ function tinybatch(callback, scheduler) {
   _fn.queue = queue;
   _fn.scheduler = scheduler;
   _fn.flush = function () {
-    if (queue.isEmpty()) {
-      return;
-    }
-    var _queue$reset = queue.reset(),
-      args = _queue$reset.args,
-      resolvers = _queue$reset.resolvers;
-    Promise.resolve(callback(args)).then(function (results) {
-      results.forEach(function (result, index) {
-        var _resolvers$index = resolvers[index],
-          resolve = _resolvers$index.resolve,
-          reject = _resolvers$index.reject;
-        if (result instanceof Error) {
-          reject(result);
-        } else {
-          resolve(result);
+    try {
+      if (queue.isEmpty()) {
+        return Promise.resolve();
+      }
+      var _queue$reset = queue.reset(),
+        args = _queue$reset.args,
+        resolvers = _queue$reset.resolvers;
+      return Promise.resolve(callback(args)).then(function (results) {
+        for (var i = 0; i < resolvers.length; i++) {
+          var _resolvers$i = resolvers[i],
+            resolve = _resolvers$i.resolve,
+            reject = _resolvers$i.reject;
+          var result = results[i];
+          if (result instanceof Error) {
+            reject(result);
+          } else {
+            resolve(result);
+          }
         }
       });
-    });
+    } catch (e) {
+      return Promise.reject(e);
+    }
   };
   return _fn;
 }

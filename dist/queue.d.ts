@@ -1,17 +1,11 @@
-import { Reject, Resolve } from "./types";
-export declare class Queue<Result, Args> {
+import { Reject, Resolve, Resolver } from "./types";
+export declare class Queue<Args, Result> {
     readonly args: Args[];
-    readonly resolvers: {
-        resolve: Resolve<Result>;
-        reject: Reject;
-    }[];
+    readonly resolvers: Resolver<Result>[];
     add(args: Args, resolve: Resolve<Result>, reject: Reject): void;
     reset(): {
         args: Args[];
-        resolvers: {
-            resolve: Resolve<Result>;
-            reject: Reject;
-        }[];
+        resolvers: Resolver<Result>[];
     };
     isEmpty(): boolean;
     get length(): number;

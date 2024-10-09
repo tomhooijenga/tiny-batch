@@ -1,5 +1,5 @@
 import { AddToBatch, ExecuteBatch, Scheduler } from "./types";
 export * from "./schedulers";
 export * from "./types";
-export declare function tinybatch<Result, Args extends unknown[] = []>(callback: ExecuteBatch<Result, Args>, scheduler?: Scheduler): AddToBatch<Result, Args>;
+export declare function tinybatch<Args extends unknown[], Result extends unknown>(callback: ExecuteBatch<Args, Result>, scheduler?: Scheduler): AddToBatch<Args, Result>;
 export default tinybatch;
