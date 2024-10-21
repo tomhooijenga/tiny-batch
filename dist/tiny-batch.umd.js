@@ -1,166 +1,166 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = global || self, factory(global.tinyBatch = {}));
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global.tinyBatch = {}));
 })(this, (function (exports) {
-    /**
-     * Queues a flush in the microtask queue at the first call.
-     */
-    var microtaskScheduler = function microtaskScheduler() {
-      return function (queue, flush) {
-        if (queue.length === 1) {
-          queueMicrotask(flush);
-        }
-      };
+  /**
+   * Queues a flush in the microtask queue at the first call.
+   */
+  var microtaskScheduler = function microtaskScheduler() {
+    return function (queue, flush) {
+      if (queue.length === 1) {
+        queueMicrotask(flush);
+      }
     };
-    /**
-     * Flushes every given ms, regardless of the queue.
-     */
-    var intervalScheduler = function intervalScheduler(ms) {
-      var timerId;
-      var fn = function fn(queue, flush) {
-        if (queue.length === 1) {
-          timerId = setInterval(flush, ms);
-        }
-      };
-      fn.stop = function () {
-        clearInterval(timerId);
-      };
-      return fn;
+  };
+  /**
+   * Flushes every given ms, regardless of the queue.
+   */
+  var intervalScheduler = function intervalScheduler(ms) {
+    var timerId;
+    var fn = function fn(queue, flush) {
+      if (queue.length === 1) {
+        timerId = setInterval(flush, ms);
+      }
     };
-    /**
-     * Waits the given amount of ms after the first call to flush.
-     */
-    var timeoutScheduler = function timeoutScheduler(ms) {
-      var timerId;
-      var fn = function fn(queue, flush) {
-        if (queue.length === 1) {
-          timerId = setTimeout(flush, ms);
-        }
-      };
-      fn.stop = function () {
-        clearTimeout(timerId);
-      };
-      return fn;
+    fn.stop = function () {
+      clearInterval(timerId);
     };
-    /**
-     * Flushes after the given amount of calls.
-     * @param max
-     */
-    var amountScheduler = function amountScheduler(max) {
-      return function (queue, flush) {
-        if (queue.length === max) {
-          flush();
-        }
-      };
+    return fn;
+  };
+  /**
+   * Waits the given amount of ms after the first call to flush.
+   */
+  var timeoutScheduler = function timeoutScheduler(ms) {
+    var timerId;
+    var fn = function fn(queue, flush) {
+      if (queue.length === 1) {
+        timerId = setTimeout(flush, ms);
+      }
     };
+    fn.stop = function () {
+      clearTimeout(timerId);
+    };
+    return fn;
+  };
+  /**
+   * Flushes after the given amount of calls.
+   * @param max
+   */
+  var amountScheduler = function amountScheduler(max) {
+    return function (queue, flush) {
+      if (queue.length === max) {
+        flush();
+      }
+    };
+  };
 
-    function _defineProperties(e, r) {
-      for (var t = 0; t < r.length; t++) {
-        var o = r[t];
-        o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
-      }
+  function _defineProperties(e, r) {
+    for (var t = 0; t < r.length; t++) {
+      var o = r[t];
+      o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
     }
-    function _createClass(e, r, t) {
-      return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
-        writable: !1
-      }), e;
+  }
+  function _createClass(e, r, t) {
+    return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
+      writable: !1
+    }), e;
+  }
+  function _toPrimitive(t, r) {
+    if ("object" != typeof t || !t) return t;
+    var e = t[Symbol.toPrimitive];
+    if (void 0 !== e) {
+      var i = e.call(t, r || "default");
+      if ("object" != typeof i) return i;
+      throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    function _toPrimitive(t, r) {
-      if ("object" != typeof t || !t) return t;
-      var e = t[Symbol.toPrimitive];
-      if (void 0 !== e) {
-        var i = e.call(t, r || "default");
-        if ("object" != typeof i) return i;
-        throw new TypeError("@@toPrimitive must return a primitive value.");
-      }
-      return ("string" === r ? String : Number)(t);
-    }
-    function _toPropertyKey(t) {
-      var i = _toPrimitive(t, "string");
-      return "symbol" == typeof i ? i : i + "";
-    }
+    return ("string" === r ? String : Number)(t);
+  }
+  function _toPropertyKey(t) {
+    var i = _toPrimitive(t, "string");
+    return "symbol" == typeof i ? i : i + "";
+  }
 
-    var Queue = /*#__PURE__*/function () {
-      function Queue() {
-        this.args = [];
-        this.resolvers = [];
+  var Queue = /*#__PURE__*/function () {
+    function Queue() {
+      this.args = [];
+      this.resolvers = [];
+    }
+    var _proto = Queue.prototype;
+    _proto.add = function add(args, resolve, reject) {
+      this.args.push(args);
+      this.resolvers.push({
+        resolve: resolve,
+        reject: reject
+      });
+    };
+    _proto.reset = function reset() {
+      var args = this.args.splice(0);
+      var resolvers = this.resolvers.splice(0);
+      return {
+        args: args,
+        resolvers: resolvers
+      };
+    };
+    _proto.isEmpty = function isEmpty() {
+      return this.args.length === 0;
+    };
+    return _createClass(Queue, [{
+      key: "length",
+      get: function get() {
+        return this.args.length;
       }
-      var _proto = Queue.prototype;
-      _proto.add = function add(args, resolve, reject) {
-        this.args.push(args);
-        this.resolvers.push({
-          resolve: resolve,
-          reject: reject
-        });
-      };
-      _proto.reset = function reset() {
-        var args = this.args.splice(0);
-        var resolvers = this.resolvers.splice(0);
-        return {
-          args: args,
-          resolvers: resolvers
-        };
-      };
-      _proto.isEmpty = function isEmpty() {
-        return this.args.length === 0;
-      };
-      return _createClass(Queue, [{
-        key: "length",
-        get: function get() {
-          return this.args.length;
+    }]);
+  }();
+
+  function tinybatch(callback, scheduler) {
+    if (scheduler === void 0) {
+      scheduler = microtaskScheduler();
+    }
+    var queue = new Queue();
+    var _fn = function fn() {
+      var _arguments = arguments;
+      return new Promise(function (resolve, reject) {
+        queue.add([].slice.call(_arguments), resolve, reject);
+        scheduler(queue.args, _fn.flush);
+      });
+    };
+    _fn.queue = queue;
+    _fn.scheduler = scheduler;
+    _fn.flush = function () {
+      try {
+        if (queue.isEmpty()) {
+          return Promise.resolve();
         }
-      }]);
-    }();
-
-    function tinybatch(callback, scheduler) {
-      if (scheduler === void 0) {
-        scheduler = microtaskScheduler();
-      }
-      var queue = new Queue();
-      var _fn = function fn() {
-        var _arguments = arguments;
-        return new Promise(function (resolve, reject) {
-          queue.add([].slice.call(_arguments), resolve, reject);
-          scheduler(queue.args, _fn.flush);
-        });
-      };
-      _fn.queue = queue;
-      _fn.scheduler = scheduler;
-      _fn.flush = function () {
-        try {
-          if (queue.isEmpty()) {
-            return Promise.resolve();
-          }
-          var _queue$reset = queue.reset(),
-            args = _queue$reset.args,
-            resolvers = _queue$reset.resolvers;
-          return Promise.resolve(callback(args)).then(function (results) {
-            for (var i = 0; i < resolvers.length; i++) {
-              var _resolvers$i = resolvers[i],
-                resolve = _resolvers$i.resolve,
-                reject = _resolvers$i.reject;
-              var result = results[i];
-              if (result instanceof Error) {
-                reject(result);
-              } else {
-                resolve(result);
-              }
+        var _queue$reset = queue.reset(),
+          args = _queue$reset.args,
+          resolvers = _queue$reset.resolvers;
+        return Promise.resolve(callback(args)).then(function (results) {
+          for (var i = 0; i < resolvers.length; i++) {
+            var _resolvers$i = resolvers[i],
+              resolve = _resolvers$i.resolve,
+              reject = _resolvers$i.reject;
+            var result = results[i];
+            if (result instanceof Error) {
+              reject(result);
+            } else {
+              resolve(result);
             }
-          });
-        } catch (e) {
-          return Promise.reject(e);
-        }
-      };
-      return _fn;
-    }
+          }
+        });
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    };
+    return _fn;
+  }
 
-    exports.amountScheduler = amountScheduler;
-    exports["default"] = tinybatch;
-    exports.intervalScheduler = intervalScheduler;
-    exports.microtaskScheduler = microtaskScheduler;
-    exports.timeoutScheduler = timeoutScheduler;
-    exports.tinybatch = tinybatch;
+  exports.amountScheduler = amountScheduler;
+  exports["default"] = tinybatch;
+  exports.intervalScheduler = intervalScheduler;
+  exports.microtaskScheduler = microtaskScheduler;
+  exports.timeoutScheduler = timeoutScheduler;
+  exports.tinybatch = tinybatch;
 
 }));
 //# sourceMappingURL=tiny-batch.umd.js.map
