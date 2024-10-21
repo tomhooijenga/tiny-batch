@@ -1,48 +1,48 @@
-import {Scheduler} from "./types";
+import { Scheduler } from "./types";
 
 /**
  * Queues a flush in the microtask queue at the first call.
  */
 export const microtaskScheduler = (): Scheduler => {
-    return (queue, flush) => {
-        if (queue.length === 1) {
-            queueMicrotask(flush);
-        }
-    };
+  return (queue, flush) => {
+    if (queue.length === 1) {
+      queueMicrotask(flush);
+    }
+  };
 };
 
 /**
  * Flushes every given ms, regardless of the queue.
  */
 export const intervalScheduler = (ms: number): Scheduler & { stop(): void } => {
-    let timerId: ReturnType<typeof setInterval>;
-    const fn: Scheduler & { stop(): void } = (queue, flush) => {
-        if (queue.length === 1) {
-            timerId = setInterval(flush, ms);
-        }
-    };
-    fn.stop = () => {
-        clearInterval(timerId);
-    };
+  let timerId: ReturnType<typeof setInterval>;
+  const fn: Scheduler & { stop(): void } = (queue, flush) => {
+    if (queue.length === 1) {
+      timerId = setInterval(flush, ms);
+    }
+  };
+  fn.stop = () => {
+    clearInterval(timerId);
+  };
 
-    return fn;
+  return fn;
 };
 
 /**
  * Waits the given amount of ms after the first call to flush.
  */
 export const timeoutScheduler = (ms: number): Scheduler & { stop(): void } => {
-    let timerId: ReturnType<typeof setTimeout>;
-    const fn: Scheduler & { stop(): void } = (queue, flush) => {
-        if (queue.length === 1) {
-            timerId = setTimeout(flush, ms);
-        }
-    };
-    fn.stop = () => {
-        clearTimeout(timerId);
-    };
+  let timerId: ReturnType<typeof setTimeout>;
+  const fn: Scheduler & { stop(): void } = (queue, flush) => {
+    if (queue.length === 1) {
+      timerId = setTimeout(flush, ms);
+    }
+  };
+  fn.stop = () => {
+    clearTimeout(timerId);
+  };
 
-    return fn;
+  return fn;
 };
 
 /**
@@ -50,9 +50,9 @@ export const timeoutScheduler = (ms: number): Scheduler & { stop(): void } => {
  * @param max
  */
 export const amountScheduler = (max: number): Scheduler => {
-    return (queue, flush) => {
-        if (queue.length === max) {
-            flush();
-        }
-    };
+  return (queue, flush) => {
+    if (queue.length === max) {
+      flush();
+    }
+  };
 };

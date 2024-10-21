@@ -2,123 +2,125 @@ require("should");
 require("should-sinon");
 const sinon = require("sinon");
 const timers = require("@sinonjs/fake-timers");
-const {microtaskScheduler, intervalScheduler, timeoutScheduler, amountScheduler} = require("../src");
+const {
+  microtaskScheduler,
+  intervalScheduler,
+  timeoutScheduler,
+  amountScheduler,
+} = require("../src");
 
 describe("schedulers", () => {
-    const QUEUE = [{}];
+  const QUEUE = [{}];
 
+  let flush;
+  beforeEach(() => {
+    flush = sinon.stub();
+  });
+
+  describe("microtaskScheduler", function () {
+    const scheduler = microtaskScheduler();
+
+    it("should flush", async () => {
+      const flush = sinon.stub();
+
+      scheduler(QUEUE, flush);
+      flush.should.not.be.called();
+      await Promise.resolve();
+      flush.should.be.calledOnce();
+    });
+  });
+
+  describe("amountScheduler", () => {
+    const scheduler = amountScheduler(2);
+
+    it("should flush", () => {
+      scheduler(QUEUE, flush);
+      flush.should.not.be.called();
+      scheduler([{}, {}], flush);
+      flush.should.be.calledOnce();
+    });
+  });
+
+  describe("timers", () => {
+    const MS = 100;
     let flush;
+    let clock;
+
     beforeEach(() => {
-        flush = sinon.stub();
+      clock = timers.install();
+      flush = sinon.stub();
     });
 
-    describe("microtaskScheduler", function () {
-        const scheduler = microtaskScheduler();
-
-        it("should flush", async () => {
-            const flush = sinon.stub();
-
-            scheduler(QUEUE, flush);
-            flush.should.not.be.called();
-            await Promise.resolve();
-            flush.should.be.calledOnce();
-        });
+    afterEach(() => {
+      clock.uninstall();
     });
 
-    describe("amountScheduler", () => {
-        const scheduler = amountScheduler(2);
+    describe("intervalScheduler", () => {
+      const scheduler = intervalScheduler(MS);
 
-        it("should flush", () => {
-            scheduler(QUEUE, flush);
-            flush.should.not.be.called();
-            scheduler([{}, {}], flush);
-            flush.should.be.calledOnce();
-        });
+      it("should flush", () => {
+        scheduler(QUEUE, flush);
+        flush.should.not.be.called();
+        clock.next();
+        flush.should.be.calledOnce();
+        clock.next();
+        flush.should.be.calledTwice();
+      });
+
+      it("should not create multiple intervals", () => {
+        sinon.spy(global, "setInterval");
+
+        scheduler(QUEUE, flush);
+        setInterval.should.be.calledOnce();
+        scheduler([{}, {}], flush);
+        setInterval.should.be.calledOnce();
+
+        setInterval.restore();
+      });
+
+      it("stop and resume", async () => {
+        scheduler(QUEUE, flush);
+        scheduler.stop();
+        clock.next();
+        flush.should.not.be.called();
+
+        scheduler(QUEUE, flush);
+        clock.next();
+        flush.should.be.calledOnce();
+      });
     });
 
-    describe("timers", () => {
-        const MS = 100;
-        let flush;
-        let clock;
+    describe("timeoutScheduler", () => {
+      const scheduler = timeoutScheduler(MS);
 
-        beforeEach(() => {
-            clock = timers.install();
-            flush = sinon.stub();
-        });
+      it("should flush", () => {
+        scheduler(QUEUE, flush);
+        flush.should.not.be.called();
+        clock.next();
+        flush.should.be.calledOnce();
+      });
 
-        afterEach(() => {
-            clock.uninstall();
-        });
+      it("should not create multiple timeouts", () => {
+        sinon.spy(global, "setTimeout");
 
-        describe("intervalScheduler", () => {
-            const scheduler = intervalScheduler(MS);
+        scheduler(QUEUE, flush);
+        setTimeout.should.be.calledOnce();
+        scheduler([{}, {}], flush);
+        setTimeout.should.be.calledOnce();
 
-            it("should flush", () => {
-                scheduler(QUEUE, flush);
-                flush.should.not.be.called();
-                clock.next();
-                flush.should.be.calledOnce();
-                clock.next();
-                flush.should.be.calledTwice();
-            });
+        setTimeout.restore();
+      });
 
-            it("should not create multiple intervals", () => {
-                sinon.spy(global, "setInterval");
+      it("stop and resume", async () => {
+        scheduler(QUEUE, flush);
+        scheduler.stop();
+        clock.next();
+        flush.should.not.be.called();
 
-                scheduler(QUEUE, flush);
-                setInterval.should.be.calledOnce();
-                scheduler([{}, {}], flush);
-                setInterval.should.be.calledOnce();
-
-                setInterval.restore();
-            });
-
-            it("stop and resume", async () => {
-                scheduler(QUEUE, flush);
-                scheduler.stop();
-                clock.next();
-                flush.should.not.be.called();
-
-                scheduler(QUEUE, flush);
-                clock.next();
-                flush.should.be.calledOnce();
-            });
-        });
-
-        describe("timeoutScheduler", () => {
-            const scheduler = timeoutScheduler(MS);
-
-            it("should flush", () => {
-                scheduler(QUEUE, flush);
-                flush.should.not.be.called();
-                clock.next();
-                flush.should.be.calledOnce();
-            });
-
-            it("should not create multiple timeouts", () => {
-                sinon.spy(global, "setTimeout");
-
-                scheduler(QUEUE, flush);
-                setTimeout.should.be.calledOnce();
-                scheduler([{}, {}], flush);
-                setTimeout.should.be.calledOnce();
-
-                setTimeout.restore();
-            });
-
-            it("stop and resume", async () => {
-                scheduler(QUEUE, flush);
-                scheduler.stop();
-                clock.next();
-                flush.should.not.be.called();
-
-                scheduler(QUEUE, flush);
-                clock.next();
-                flush.should.be.calledOnce();
-            });
-        });
+        scheduler(QUEUE, flush);
+        clock.next();
+        flush.should.be.calledOnce();
+      });
     });
+  });
 });
-
-
-
