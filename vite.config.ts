@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
+import { defineConfig } from "vite";
+import { resolve } from "path";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
   plugins: [
@@ -11,13 +11,13 @@ export default defineConfig({
   build: {
     minify: false,
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'TinyBatch',
-      formats: ['es', 'cjs'],
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "TinyBatch",
+      formats: ["es", "cjs"],
     },
     rollupOptions: {
       output: {
-        exports: 'named',
+        exports: "named",
       },
     },
     sourcemap: true,
