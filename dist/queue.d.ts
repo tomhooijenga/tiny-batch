@@ -1,4 +1,4 @@
-import { Reject, Resolve, Resolver } from "./types";
+import { Reject, Resolve, Resolver } from './types';
 export declare class Queue<Args, Result> {
     readonly args: Args[];
     readonly resolvers: Resolver<Result>[];

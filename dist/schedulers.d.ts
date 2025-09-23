@@ -1,4 +1,4 @@
-import { Scheduler } from "./types";
+import { Scheduler } from './types';
 /**
  * Queues a flush in the microtask queue at the first call.
  */

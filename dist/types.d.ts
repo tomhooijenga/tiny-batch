@@ -1,4 +1,4 @@
-import { Queue } from "./queue";
+import { Queue } from './queue';
 export type ExecuteBatch<Args extends unknown[], Result = void> = Result extends void ? (args: Args[]) => void : (args: Args[]) => Result[] | Promise<Result[]>;
 export interface AddToBatch<Args extends unknown[], Result> {
     (...args: Args): Promise<Result>;
